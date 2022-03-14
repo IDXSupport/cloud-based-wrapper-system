@@ -69,6 +69,11 @@ function turnElementAttributeAbsolute($, tagName, attribute, base) {
         && attributeValue == undefined) {
           return;
         }
+        
+        // If the attribute value starts with a # (so it's an anchor link), it should be left alone         
+        if (attributeValue.startsWith('#')) {           
+          return;         
+        }
 
         element.attr(attribute, getAbsoluteUrl(attributeValue, base));
     });
