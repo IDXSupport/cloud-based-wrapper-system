@@ -67,21 +67,20 @@ function getAbsoluteUrl(path, base) {
  */
 function turnElementAttributeAbsolute($, tagName, attribute, base) {
     $(tagName).each(function() {
-        let element = $(this);
-        let attributeValue = element.attr(attribute);
+      let element = $(this);
+      let attributeValue = element.attr(attribute);
 
-        // Script tags might not have an src attribute set; when this is the case, we shouldn't change anything.
-        if (tagName == 'script' 
-        && attributeValue == undefined) {
-          return;
-        }
-        
-        // If the attribute value starts with a # (so it's an anchor link), it should be left alone         
-        if (attributeValue.startsWith('#')) {           
-          return;         
-        }
+      // Tags might not have the attribute set; when this is the case, we shouldn't change anything.
+      if (attributeValue == undefined) {
+        return;
+      }
+      
+      // If the attribute value starts with a # (so it's an anchor link), it should be left alone         
+      if (attributeValue.startsWith('#')) {           
+        return;         
+      }
 
-        element.attr(attribute, getAbsoluteUrl(attributeValue, base));
+      element.attr(attribute, getAbsoluteUrl(attributeValue, base));
     });
 }
 
