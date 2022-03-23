@@ -48,7 +48,13 @@ function removeEnclosingFormTag($, element) {
 // Uses the URL object to return the provided path in absolute terms, using the base if needed
 // Note that if the path is already absolute, the base will not be used.
 function getAbsoluteUrl(path, base) {
-  let url = new URL(path, base);
+  let url;
+  try {
+    url = new URL(path, base);
+  } catch (e) {
+    // We might see an exception here if the path is not a URL... just return the path as it is if so.
+    return path;
+  }
   return url.href;
 }
 
