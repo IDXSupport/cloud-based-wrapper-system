@@ -4,6 +4,7 @@ const absolutify = require('absolutify');
 const converter = require('rel-to-abs');
 const extractDomain = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/gim;
 const idxtags = '<div id="idxStart"></div><div id="idxStop"></div>';
+const cssUrlMissingHttpRegex = /url\(['|"]?((?!(\/\/|https?:)).*)['|"]?\)/g;
 
 function getSite (url) {
   return axios.get(url)
@@ -124,6 +125,20 @@ exports.handler = async (event) => {
     turnElementAttributeAbsolute($, 'img', 'src', url);
     turnElementAttributeAbsolute($, 'link', 'href', url);
     turnElementAttributeAbsolute($, 'script', 'src', url);
+
+    // Try to replace any relative @imports and other url()s inside style tags
+    $('style').each(function(){
+      let innerHtml = $(this).html();
+      let missingCssUrlMatch;
+      while ((missingCssUrlMatch = cssUrlMissingHttpRegex.exec(innerHtml)) != null) {
+          let relativeUrl = missingCssUrlMatch[1];
+          console.log(missingCssUrlMatch[0]);
+          console.log(relativeUrl);
+          console.log(`@import url('${domain}'/${relativeUrl}')`);
+          innerHtml = innerHtml.replace(missingCssUrlMatch[0], `url('${domain}/${relativeUrl.replace('"','').replace("'", '')}')`);
+      }
+      $(this).html(innerHtml);
+    });
 
     // Try to remove any known script conflicts if removeConflicts was set
     if (removeConflicts == 'y') {
